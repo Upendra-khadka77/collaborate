@@ -2,19 +2,146 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>To-Do App</title>
-  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      padding-top: 50px;
+    }
+
+    .todo-container {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      background: #f9f9f9;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+
+    li.done span {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .delete-btn {
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="todo-container">
-    <h1>My To-Do List</h1>
+    <h1>To-Do List</h1>
     <form id="todo-form">
       <input type="text" id="todo-input" placeholder="Add a new task..." required />
       <button type="submit">Add</button>
     </form>
     <ul id="todo-list"></ul>
   </div>
-  <script src="script.js"></script>
+
+  <script>
+    const form = document.getElementById('todo-form');
+    const input = document.getElementById('todo-input');
+    const list = document.getElementById('todo-list');
+
+    let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+    function renderTodos() {
+      list.innerHTML = '';
+      todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+        li.className = todo.completed ? 'done' : '';
+        li.innerHTML = `
+          <span onclick="toggleTodo(${index})">${todo.text}</span>
+          <button class="delete-btn" onclick="deleteTodo(${index})">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function addTodo(text) {
+      todos.push({ text, completed: false });
+      updateTodos();
+    }
+
+    function toggleTodo(index) {
+      todos[index].completed = !todos[index].completed;
+      updateTodos();
+    }
+
+    function deleteTodo(index) {
+      todos.splice(index, 1);
+      updateTodos();
+    }
+
+    function updateTodos() {
+      localStorage.setItem('todos', JSON.stringify(todos));
+      renderTodos();
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (text !== '') {
+        addTodo(text);
+        input.value = '';
+      }
+    });
+
+    renderTodos();
+  </script>
 </body>
 </html>
+
